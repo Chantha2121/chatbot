@@ -106,7 +106,7 @@ function typeMessage(message, sender) {
     let index = 0;
     function typeNextLetter() {
         if (index < message.length) {
-            let endIndex = index + maxLength;
+          let endIndex = index + maxLength;
             if (endIndex > message.length) endIndex = message.length;
 
             let segment = message.slice(index, endIndex);
