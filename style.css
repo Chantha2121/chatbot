@@ -31,18 +31,53 @@ body {
 }
 
 .chat-box .message {
-    font-size: 20px;
-    color: white !important;
+    display: flex;
+    align-items: flex-start;
     margin-bottom: 20px;
-    word-wrap: break-word;
 }
 
-.chat-box .user {
+.chat-box .message img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.chat-box .message.user {
+    justify-content: flex-end;
     text-align: right;
 }
 
-.chat-box .bot {
-    text-align: left;
+.chat-box .message.user img {
+    order: 2;
+    margin-left: 10px;
+}
+
+.chat-box .message.user .text {
+    background-color: #007bff;
+    color: white;
+    margin-right: 10px;
+}
+
+.chat-box .message.bot {
+    justify-content: flex-start;
+}
+
+.chat-box .message.bot img {
+    margin-right: 10px;
+}
+
+.chat-box .message.bot .text {
+    background-color: #333;
+    color: white;
+}
+
+.chat-box .text {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    max-width: 70%;
+    word-wrap: break-word;
 }
 
 input[type="text"] {
