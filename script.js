@@ -1,5 +1,3 @@
-// script.js
-
 function sendMessage() {
     var userInput = document.getElementById("user-input").value;
     if (userInput.trim() === "") return;
@@ -9,9 +7,7 @@ function sendMessage() {
 
     // Simulate bot response
     var botResponse = getBotResponse(userInput);
-    setTimeout(() => {
-        displayMessage(botResponse, "bot");
-    }, 1000);
+    typeMessage(botResponse, "bot");
 
     // Clear the input
     document.getElementById("user-input").value = "";
@@ -21,14 +17,22 @@ function displayMessage(message, sender) {
     var chatBox = document.getElementById("chat-box");
     var messageElement = document.createElement("div");
     messageElement.className = "message " + sender;
-    messageElement.innerText = message;
+
+    // Split message by new lines and create new div for each line
+    const messageLines = message.split("\n");
+    messageLines.forEach((line) => {
+        const lineElement = document.createElement("div");
+        lineElement.innerText = line;
+        messageElement.appendChild(lineElement);
+    });
+
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function getBotResponse(input) {
     input = input.toLowerCase().trim();
-    const words = input.split(" ");
+    const words = input.split(",");
     
     // Check for encryption command
     if (words[0] === "encrypt" && words.length === 3) {
@@ -48,7 +52,7 @@ function getBotResponse(input) {
         "bye": "Goodbye!",
         "thanks": "No problem if you have question please ask me.",
         "thank you": "No problem if you have question please ask me.",
-        "do you know cambodia?":"Yes I know. cambodiaCambodia officially the Kingdom of Cambodia is a country in Southeast Asia on the Indochinese Peninsula, spanning an area of 181,035 square kilometres (69,898 square miles), bordered by Thailand to the northwest, Laos to the north, Vietnam to the east, and the Gulf of Thailand to the southwest. The capital and most populous city is Phnom Penh.",
+        "do you know cambodia?": "Yes I know.\nCambodia, officially the Kingdom of Cambodia,\nis a country in Southeast Asia on the \nIndochinese Peninsula,spanning an area of\n 181,035 square kilometres(69,898 square miles), \nbordered by Thailand to the northwest, Laos to \nthe north, Vietnam to the east, and\n the Gulf of Thailand to the southwest.The capital \nand most populous city is Phnom Penh.",
         "សួស្តី":"បាទ​! សួស្តី",
         "តើអ្នកសុខសប្បាយទេ?":"បាទ! ខ្ញុំសុខសប្បាយទេ ចោះអ្នកវិញ។",
         "សុខសប្បាយ":"អូ! ពិតជាល្អណាស់",
@@ -71,4 +75,29 @@ function encryptCaesarCipher(text, shift) {
         }
     }
     return `Encrypted text: ${result}`;
+}
+
+function typeMessage(message, sender) {
+    var chatBox = document.getElementById("chat-box");
+    var messageElement = document.createElement("div");
+    messageElement.className = "message " + sender;
+    chatBox.appendChild(messageElement);
+
+    let index = 0;
+    function typeNextLetter() {
+        if (index < message.length) {
+            if (message[index] === "\n") {
+                messageElement.appendChild(document.createElement("br"));
+            } else if (message[index] === " ") {
+                messageElement.innerHTML += "&nbsp;";
+            } else {
+                messageElement.innerHTML += message[index];
+            }
+            index++;
+            setTimeout(typeNextLetter, 50); // Adjust typing speed here
+        } else {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+    typeNextLetter();
 }
