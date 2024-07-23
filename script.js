@@ -1,5 +1,3 @@
-// script.js
-
 function sendMessage() {
     var userInput = document.getElementById("user-input").value;
     if (userInput.trim() === "") return;
@@ -43,13 +41,24 @@ function displayMessage(message, sender) {
 function getBotResponse(input) {
     input = input.toLowerCase().trim();
     const words = input.split(",");
-    
+
     // Check for encryption command
     if (words[0] === "encrypt" && words.length === 3) {
         const textToEncrypt = words[1];
         const shift = parseInt(words[2]);
         if (!isNaN(shift)) {
             return encryptCaesarCipher(textToEncrypt, shift);
+        } else {
+            return "Invalid shift value. Please provide a number.";
+        }
+    }
+
+    // Check for decryption command
+    if (words[0] === "decrypt" && words.length === 3) {
+        const textToDecrypt = words[1];
+        const shift = parseInt(words[2]);
+        if (!isNaN(shift)) {
+            return decryptCaesarCipher(textToDecrypt, shift);
         } else {
             return "Invalid shift value. Please provide a number.";
         }
@@ -87,6 +96,22 @@ function encryptCaesarCipher(text, shift) {
     return `Encrypted text: ${result}`;
 }
 
+function decryptCaesarCipher(text, shift) {
+    const shiftNormalized = shift % 26;
+    let result = "";
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char.match(/[a-z]/)) {
+            const code = text.charCodeAt(i);
+            const shiftedCode = ((code - 97 - shiftNormalized + 26) % 26) + 97;
+            result += String.fromCharCode(shiftedCode);
+        } else {
+            result += char;
+        }
+    }
+    return `Decrypted text: ${result}`;
+}
+
 function typeMessage(message, sender) {
     var chatBox = document.getElementById("chat-box");
     var messageElement = document.createElement("div");
@@ -102,26 +127,18 @@ function typeMessage(message, sender) {
     messageElement.appendChild(textElement);
     chatBox.appendChild(messageElement);
 
-    const maxLength = 50; // Define max length for each segment
     let index = 0;
     function typeNextLetter() {
         if (index < message.length) {
-          let endIndex = index + maxLength;
-            if (endIndex > message.length) endIndex = message.length;
-
-            let segment = message.slice(index, endIndex);
-
-            for (let i = 0; i < segment.length; i++) {
-                if (segment[i] === "\n") {
-                    textElement.appendChild(document.createElement("br"));
-                } else if (segment[i] === " ") {
-                    textElement.innerHTML += "&nbsp;";
-                } else {
-                    textElement.innerHTML += segment[i];
-                }
+            let char = message[index];
+            if (char === "\n") {
+                textElement.appendChild(document.createElement("br"));
+            } else if (char === " ") {
+                textElement.innerHTML += "&nbsp;";
+            } else {
+                textElement.innerHTML += char;
             }
-
-            index += maxLength;
+            index++;
             setTimeout(typeNextLetter, 50); // Adjust typing speed here
         } else {
             chatBox.scrollTop = chatBox.scrollHeight;

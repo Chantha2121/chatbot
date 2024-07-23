@@ -1,5 +1,5 @@
 /* styles.css */
-body {
+.body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -7,12 +7,13 @@ body {
     height: 100vh;
     background-color: #f0f0f0;
     margin: 0;
+    margin-top: 0;
 }
 .chat-container {
     height: 600px;
     background-color: #fff;
     width: 90%;
-    max-width: 500px;
+    max-width: 850px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -23,7 +24,7 @@ body {
 .chat-box {
     flex: 1;
     height: 400px;
-    background-color: black;
+    background-color: #CCFFE5;
     overflow-y: auto;
     padding: 20px;
     border-bottom: 1px solid #ddd;
@@ -36,8 +37,8 @@ body {
 }
 
 .chat-box .message img {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
 }
 
@@ -74,14 +75,15 @@ body {
     background-color: #333;
     padding: 10px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 20px;
     max-width: 70%;
     word-wrap: break-word;
 }
 
 input[type="text"] {
-    font-size: 17px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 400;
+    height:6vh;
     width: calc(100% - 10px);
     padding: 10px;
     border: none;
@@ -114,18 +116,38 @@ button:hover {
     }
 
     .chat-box {
-        padding: 10px;
+        padding: 20px;
     }
 
     input[type="text"] {
-        font-size: 14px;
+        font-size: 18px;
     }
 
     button {
-        font-size: 14px;
+        font-size: 18px;
+        height: 70px;
     }
 
     .chat-box .message {
-        font-size: 16px;
+        font-size: 18px;
     }
+    .head, h1{
+        font-size: 30px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+        color: white;
+    }
+}
+.head,h1{
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+    color: white;
+}
+body{
+    background-color: black;
 }
