@@ -43,24 +43,28 @@ function getBotResponse(input) {
     const words = input.split(",");
 
     // Check for encryption command
-    if (words[0] === "encrypt" && words.length === 3) {
+    if (words[0] === "encrypt" && words.length === 5) {
         const textToEncrypt = words[1];
-        const shift = parseInt(words[2]);
-        if (!isNaN(shift)) {
-            return encryptCaesarCipher(textToEncrypt, shift);
+        const p = parseInt(words[2]);
+        const q = parseInt(words[3]);
+        const e = parseInt(words[4]);
+        if (!isNaN(p) && !isNaN(q) && !isNaN(e)) {
+            return encryptTextToNumbers(textToEncrypt, p, q, e);
         } else {
-            return "Invalid shift value. Please provide a number.";
+            return "Invalid values. Please provide two prime numbers and the public exponent.";
         }
     }
 
     // Check for decryption command
-    if (words[0] === "decrypt" && words.length === 3) {
-        const textToDecrypt = words[1];
-        const shift = parseInt(words[2]);
-        if (!isNaN(shift)) {
-            return decryptCaesarCipher(textToDecrypt, shift);
+    if (words[0] === "decrypt" && words.length === 5) {
+        const numbersToDecrypt = words[1].split(" ").map(Number);
+        const p = parseInt(words[2]);
+        const q = parseInt(words[3]);
+        const e = parseInt(words[4]);
+        if (!isNaN(p) && !isNaN(q) && !isNaN(e)) {
+            return decryptNumbersToText(numbersToDecrypt, p, q, e);
         } else {
-            return "Invalid shift value. Please provide a number.";
+            return "Invalid values. Please provide two prime numbers and the public exponent.";
         }
     }
 
@@ -69,47 +73,71 @@ function getBotResponse(input) {
         "hi": "Hello!",
         "how are you": "I'm a bot, so I'm always good.",
         "bye": "Goodbye!",
-        "thanks": "No problem if you have question please ask me.",
-        "thank you": "No problem if you have question please ask me.",
-        "do you know cambodia?": "Yes I know.\nCambodia, officially the Kingdom of Cambodia,is a country in Southeast Asia on the Indochinese Peninsula, spanning an area of 181,035 square kilometres (69,898 square miles), bordered by Thailand to the northwest, Laos to the north, Vietnam to the east, and the Gulf of Thailand to the southwest. The capital and most populous city is Phnom Penh.",
-        "សួស្តី":"បាទ​! សួស្តី",
-        "តើអ្នកសុខសប្បាយទេ?":"បាទ! ខ្ញុំសុខសប្បាយទេ ចោះអ្នកវិញ។",
-        "សុខសប្បាយ":"អូ! ពិតជាល្អណាស់",
+        "thanks": "No problem if you have questions, please ask me.",
+        "thank you": "No problem if you have questions, please ask me.",
+        "do you know cambodia?": "Yes, I know.\nCambodia, officially the Kingdom of Cambodia, is a country in Southeast Asia on the Indochinese Peninsula, spanning an area of 181,035 square kilometers (69,898 square miles), bordered by Thailand to the northwest, Laos to the north, Vietnam to the east, and the Gulf of Thailand to the southwest. The capital and most populous city is Phnom Penh.",
+        "សួស្តី": "បាទ​! សួស្តី",
+        "តើអ្នកសុខសប្បាយទេ?": "បាទ! ខ្ញុំសុខសប្បាយទេ ចោះអ្នកវិញ។",
+        "សុខសប្បាយ": "អូ! ពិតជាល្អណាស់",
     };
 
     return responses[input] || "I don't understand that.";
 }
 
-function encryptCaesarCipher(text, shift) {
-    const shiftNormalized = shift % 26;
-    let result = "";
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char.match(/[a-z]/)) {
-            const code = text.charCodeAt(i);
-            const shiftedCode = ((code - 97 + shiftNormalized + 26) % 26) + 97;
-            result += String.fromCharCode(shiftedCode);
-        } else {
-            result += char;
-        }
+// Function to compute the modular inverse
+function modInverse(e, phi) {
+    let m0 = phi, t, q;
+    let x0 = 0, x1 = 1;
+    if (phi === 1) return 0;
+
+    while (e > 1) {
+        q = Math.floor(e / phi);
+        t = phi;
+
+        // phi is remainder now, process same as Euclid's algo
+        phi = e % phi;
+        e = t;
+        t = x0;
+
+        x0 = x1 - q * x0;
+        x1 = t;
     }
-    return `Encrypted text: ${result}`;
+
+    if (x1 < 0) x1 += m0;
+
+    return x1;
 }
 
-function decryptCaesarCipher(text, shift) {
-    const shiftNormalized = shift % 26;
-    let result = "";
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char.match(/[a-z]/)) {
-            const code = text.charCodeAt(i);
-            const shiftedCode = ((code - 97 - shiftNormalized + 26) % 26) + 97;
-            result += String.fromCharCode(shiftedCode);
-        } else {
-            result += char;
-        }
+function encryptTextToNumbers(text, p, q, e) {
+    const n = p * q;
+    const encrypted = text.split("").map(char => {
+        const asciiValue = char.charCodeAt(0);
+        return modExp(asciiValue, e, n);
+    }).join(" ");
+    return `Encrypted text: ${encrypted}`;
+}
+
+function decryptNumbersToText(numbers, p, q, e) {
+    const n = p * q;
+    const phi = (p - 1) * (q - 1);
+    const d = modInverse(e, phi);
+    const decrypted = numbers.map(num => {
+        const decryptedAscii = modExp(num, d, n);
+        return String.fromCharCode(decryptedAscii);
+    }).join("");
+    return `Decrypted text: ${decrypted}`;
+}
+
+// Function to perform modular exponentiation
+function modExp(base, exp, mod) {
+    let result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 === 1) result = (result * base) % mod;
+        exp = Math.floor(exp / 2);
+        base = (base * base) % mod;
     }
-    return `Decrypted text: ${result}`;
+    return result;
 }
 
 function typeMessage(message, sender) {
